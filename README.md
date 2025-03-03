@@ -144,6 +144,7 @@ git push heroku master
 ```
 
 ### **Live API on Heroku**
-Heroku Deployment: [https://simple-task-app.herokuapp.com](https://simple-task-app.herokuapp.com)
+- Heroku Deployment frontend: [https://simple-task-app-bdd22b40cf02.herokuapp.com/](https://simple-task-app-bdd22b40cf02.herokuapp.com/)
 
+- Heroku Deployment endpoints: [https://simple-task-app-bdd22b40cf02.herokuapp.com/docs#/](https://simple-task-app-bdd22b40cf02.herokuapp.com/docs#/)
 ---
