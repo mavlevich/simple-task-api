@@ -20,7 +20,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=." >> $GITHUB_ENV
+        run: echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
 
       - name: Run tests
         run: pytest tests/
@@ -35,9 +35,14 @@ jobs:
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
 
+      - name: Login to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: echo $HEROKU_API_KEY | heroku auth:token
+
       - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
           heroku git:remote -a simple-task-app
-          git push heroku master
+          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/simple-task-app.git master -f
