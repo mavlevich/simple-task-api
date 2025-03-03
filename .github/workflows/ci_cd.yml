@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -31,6 +33,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install.sh | sh
@@ -40,9 +44,12 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: echo $HEROKU_API_KEY | heroku auth:token
 
+      - name: Prepare git for Heroku
+        run: |
+          git fetch --unshallow
+          git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/simple-task-app.git
+
       - name: Deploy to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          heroku git:remote -a simple-task-app
-          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/simple-task-app.git master -f
+        run: git push heroku master -f
