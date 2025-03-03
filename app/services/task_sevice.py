@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.task_model import Task
 from app.schemas.task_schema import TaskCreate, TaskResponse
 from app.repositories.task_repo import TaskRepository
+from typing import List
 
 
 class TaskService:
@@ -32,3 +33,7 @@ class TaskService:
 
     def delete_task(self, task_id: int):
         return TaskRepository.delete_task(self.db, task_id)
+
+    # def search_tasks(self, title: str) -> List[TaskResponse]:
+    #     tasks = self.db.query(Task).filter(Task.title.ilike(f"%{title}%")).all()
+    #     return [TaskResponse(**task.__dict__) for task in tasks]

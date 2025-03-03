@@ -2,7 +2,7 @@ import pytest
 import threading
 from fastapi.testclient import TestClient
 from app.main import app
-from app.db.session import get_db, SessionLocal
+from app.db.session import SessionLocal
 from app.models.task_model import Task
 
 client = TestClient(app)
@@ -192,3 +192,53 @@ def test_delete_all_tasks():
     final_response = client.get("/tasks")
     assert final_response.status_code == 200
     assert final_response.json() == []
+
+
+def test_create_task_without_description():
+    response = client.post(
+        "/tasks",
+        json={"title": "Task Without Desc", "completed": False},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["title"] == "Task Without Desc"
+    assert data["description"] is None
+
+
+def test_get_tasks_when_empty(test_db):
+    test_db.query(Task).delete()
+    test_db.commit()
+
+    response = client.get("/tasks")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) == 0
+
+
+def test_get_task_with_negative_id():
+    response = client.get("/tasks/-1")
+    assert response.status_code == 404
+
+
+def test_partial_task_update(create_test_task):
+    task_id = create_test_task["id"]
+    response = client.put(
+        f"/tasks/{task_id}",
+        json={"title": "Partially Updated Title", "description": create_test_task["description"],
+              "completed": create_test_task["completed"]},
+    )
+    assert response.status_code == 200
+    updated_task = response.json()
+    assert updated_task["title"] == "Partially Updated Title"
+    assert updated_task["description"] == create_test_task["description"]
+    assert updated_task["completed"] == create_test_task["completed"]
+
+
+def test_delete_already_deleted_task(create_test_task):
+    task_id = create_test_task["id"]
+    response1 = client.delete(f"/tasks/{task_id}")
+    response2 = client.delete(f"/tasks/{task_id}")
+
+    assert response1.status_code == 200
+    assert response2.status_code == 404
