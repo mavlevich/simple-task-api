@@ -42,12 +42,15 @@ jobs:
       - name: Login to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: echo $HEROKU_API_KEY | heroku auth:token
+        run: heroku auth:token
 
       - name: Prepare git for Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          git fetch --unshallow
           git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/simple-task-app.git
+          git config --global user.email "ci-cd@github.com"
+          git config --global user.name "GitHub Actions"
 
       - name: Deploy to Heroku
         env:
